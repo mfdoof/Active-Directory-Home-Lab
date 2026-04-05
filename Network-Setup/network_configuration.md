@@ -78,6 +78,7 @@ In the adapter Properties window uncheck IPv6 to disable it.
 
 **Step 6 — Verify Configuration**      
 Open Command Prompt and run the following command to confirm all settings are applied correctly.  
+`ipconfig /all`
 
 Confirm the following:
 - IPv4 Address shows your static IP
