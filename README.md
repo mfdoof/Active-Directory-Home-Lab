@@ -12,6 +12,7 @@ A hands on project on Active Directory using Windows Server 2022 on Hyper-V
 - Port mapping and analysis
 - Service management and vulnerability mitigation
 - Technical documentation
+- OU, User, and Groups management
 
 ## Lab Environment
 
@@ -25,23 +26,61 @@ A hands on project on Active Directory using Windows Server 2022 on Hyper-V
 
 ## Phases
 
-**Phase 1 — Virtual Machine Setup**  
-Configured a Windows Server 2022 VM in Hyper-V with an External Switch for real networking simulation.
+### Phase 1 — Server Setup
+- Created Windows Server 2022 VM in Hyper-V
+- Configured hardware: 4096MB RAM, 4 vCPUs, Dynamic VHDX
+- Selected External Switch for real network simulation
 
-**Phase 2 — Network Configuration**  
-Assigned a static IP, configured DNS to loopback address (127.0.0.1), and disabled IPv6.
+### Phase 2 — Network Configuration
+- Assigned static IP to Domain Controller
+- Set DNS to loopback `127.0.0.1` with router IP as fallback
+- Disabled IPv6 to prevent unexpected behavior
 
-**Phase 3 — Active Directory Installation**  
-Installed AD DS and DNS roles, promoted the server to a Domain Controller, and created the forest.
+### Phase 3 — Active Directory Installation
+- Installed AD DS and DNS Server roles
+- Promoted server to Domain Controller
+- Created new forest with root domain `DOOF.local`
+- Fixed Windows Time Service warning via `w32tm`
 
-**Phase 4 — Security Hardening**  
-Mapped all open ports, blocked unnecessary protocols, disabled vulnerable services, and enabled firewall logging.
+### Phase 4 — Security Hardening
+- Mapped all listening ports via `netstat -ano`
+- Created inbound block rules for unnecessary ports
+- Disabled unnecessary services
 
-## What is Next
-- [ ] Password and lockout policy via GPO
-- [ ] Join a client VM to the domain
-- [ ] Create OUs, Users, and Groups
-- [ ] Configure Group Policy Objects
-- [ ] Set up pfSense as virtual router
+### Phase 5 — AD Structure (OUs, Users, Groups)  
+- Created custom OU structure under `DOOF.local`
+- Created domain user accounts with enforced password change on first logon
+- Created security groups following `GRP-DEPT` naming convention
+- Assigned users to groups for RBAC
+
+### Phase 6 — GPO Password and Lockout Policy  
+- Configured Default Domain Policy with password and lockout settings
+- Applied domain-wide via `Set-ADDefaultDomainPasswordPolicy`
+- Verified with `Get-ADDefaultDomainPasswordPolicy`
+
+---
+
+## Tools Used
+| Tool | Purpose |
+|---|---|
+| Hyper-V | Virtualization |
+| Windows Server 2022 | Domain Controller OS |
+| Active Directory Users and Computers (ADUC) | AD object management |
+| Group Policy Management (GPMC) | GPO configuration |
+| PowerShell | Automation and verification |
+| Windows Defender Firewall | Network hardening |
+
+## Pending
+- [ ] Join Windows 10/11 client VM to domain
+- [ ] Configure Fine-Grained Password Policy (PSO) for privileged accounts
+- [ ] Deploy LAPS for local admin password management
+- [ ] Set up pfSense as virtual router and firewall
+- [ ] Configure SIEM (Wazuh or Splunk) for log ingestion
+- [ ] BloodHound AD attack path analysis and remediation
+
+---
+
+
+
 
 
