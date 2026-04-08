@@ -37,6 +37,8 @@ Windows Firewall processes rules in the following order:
 | 139 | TCP | NetBIOS Session | Legacy protocol, showing in netstat output |
 | 593 | TCP | RPC over HTTP | Unnecessary remote management port on a Domain Controller |
 | 5985 | TCP | WinRM HTTP | Unencrypted Windows remote management |
+| 5986 | TCP | WinRM HTTPS | Encrypted Windows remote management |
+
 
 ### RDP Status
 
@@ -87,6 +89,12 @@ Test-NetConnection -ComputerName SERVER_IP -Port PORT_NUMBER
 TcpTestSucceeded : False
 ```
 
+```powershell
+# Verify no NetBIOS or WinRM ports listening
+netstat -ano | Select-String ":137|:138|:139|:5985|:5986"
+# Expected: no output
+```
+
 **Important:** Always test block rules from the host machine and not from inside the server itself. Testing from inside the server uses the loopback interface which bypasses firewall rules and will always return True regardless of the rule.
 
 ### Verification Results
@@ -100,6 +108,7 @@ TcpTestSucceeded : False
 | 139 | NetBIOS Session | False | Confirmed Blocked |
 | 593 | RPC over HTTP | False | Confirmed Blocked |
 | 5985 | WinRM HTTP | False | Confirmed Blocked |
+| 5986 | WinRM HTTPS | False | Confirmed Blocked |
 
 ### Firewall Logging
 Firewall logging was enabled on all three profiles to monitor traffic hitting the server.
