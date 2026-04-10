@@ -147,35 +147,37 @@ Get-DnsServerForwarder
 Root hints are a hardcoded list of the 13 internet root DNS servers maintained by IANA. When configured alongside a forwarder, they create ambiguity — both serve the same purpose of resolving external names. Having both causes `dcdiag /test:dns` Forw failures.
 
 **Root hints vs Forwarder:**
-
 | | Root Hints | Forwarder |
 |---|---|---|
 | How it works | DC queries root servers directly, walks DNS hierarchy | DC hands query to upstream resolver |
 | Use case | ISP-level or internet-facing authoritative servers | Internal DCs with an upstream resolver |
 | Home lab | Not appropriate | Correct choice |
 
-### Step-by-Step — PowerShell
+### Current State
+Root hints were disabled rather than removed as a precaution. Disabling prevents DNS resolution from falling back to root hints while keeping them intact if the forwarder configuration needs to be rolled back. Removing root hints entirely is the cleaner production approach but carries more risk in a lab environment where configuration changes are ongoing.
 
+> **Note:** Microsoft does not officially support removing all root hints from a DNS server. Root hints removed via DNS Manager may reappear after ~15 minutes as they persist in `cache.dns` and Active Directory. Disabling fallback via the Forwarders tab is the safer and more reliable approach.
+
+### Configuration — GUI
+1. Open **DNS Manager** → `dnsmgmt.msc`
+2. Right-click your DNS server → **Properties**
+3. Select the **Forwarders** tab
+4. Uncheck **"Use root hints if no forwarders are available"**
+5. Click **OK**
+
+### Configuration — PowerShell
 ```powershell
-# Step 1 — Check if root hints exist
-Get-DnsServerRootHint
+# Step 1 — Check current forwarder and root hint fallback setting
+Get-DnsServerForwarder
 
-# Step 2 — Remove all root hints
-Get-DnsServerRootHint | Remove-DnsServerRootHint
+# Step 2 — Disable root hints fallback
+Set-DnsServerForwarder -UseRootHint $false
 
-# Step 3 — Verify removal
-Get-DnsServerRootHint
-# Expected: no output
+# Step 3 — Verify
+Get-DnsServerForwarder
+# Expected: UseRootHint = False
+\```
 ```
-
-### Step-by-Step — GUI
-
-1. Open `dnsmgmt.msc`
-2. Right-click your server name → Properties
-3. Select the **Advanced** tab
-4. Check **Disable recursion** — this also disables root hints
-5. Alternatively: expand your server → expand **Root Hints** folder → delete all entries manually
-
 
 ## Part 5 — Verification
 
@@ -306,15 +308,8 @@ ipconfig /registerdns
 | Preferred DNS (NIC) | DC01 own static IP |
 | Alternate DNS (NIC) | Cloudflare 1.1.1.1 |
 | DNS Forwarder | Cloudflare 1.1.1.1 / 1.0.0.1 |
-| Root Hints | Pending removal |
+| Root Hints | Disabled |
 | DOOF.local resolution | Working |
-| External resolution | Working |
-| dcdiag status | Forw failing — root hints removal pending |
 
 
-## Pending
 
-- [ ] Remove root hints
-- [ ] Re-run `dcdiag /test:dns /v` to confirm full pass
-- [ ] Update Final State table after root hints removal
-- [ ] Confirm dcdiag full pass after Windows 11 client joins domain
