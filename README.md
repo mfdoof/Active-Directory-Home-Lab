@@ -71,7 +71,6 @@ A hands on project on Active Directory using Windows Server 2022 on Hyper-V
 | Windows Defender Firewall | Network hardening |
 
 ## Pending
-- [ ] Join Windows 10/11 client VM to domain
 - [ ] Configure Fine-Grained Password Policy (PSO) for privileged accounts
 - [ ] Deploy LAPS for local admin password management
 - [ ] Set up pfSense as virtual router and firewall
