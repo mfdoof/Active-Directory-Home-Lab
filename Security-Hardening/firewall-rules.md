@@ -32,12 +32,6 @@ Windows Firewall processes rules in the following order:
 |---|---|---|---|
 | 21 | TCP | FTP | Unencrypted file transfer, not needed on a Domain Controller |
 | 23 | TCP | Telnet | Unencrypted remote access, outdated and replaced by SSH |
-| 137 | UDP | NetBIOS Name Service | Legacy protocol, vulnerable to NBNS spoofing attacks |
-| 138 | UDP | NetBIOS Datagram | Legacy protocol, unnecessary on a Domain Controller |
-| 139 | TCP | NetBIOS Session | Legacy protocol, showing in netstat output |
-| 593 | TCP | RPC over HTTP | Unnecessary remote management port on a Domain Controller |
-| 5985 | TCP | WinRM HTTP | Unencrypted Windows remote management |
-| 5986 | TCP | WinRM HTTPS | Encrypted Windows remote management |
 
 
 ### RDP Status
@@ -103,12 +97,6 @@ netstat -ano | Select-String ":137|:138|:139|:5985|:5986"
 |---|---|---|---|
 | 21 | FTP | False | Confirmed Blocked |
 | 23 | Telnet | False | Confirmed Blocked |
-| 137 | NetBIOS Name Service | False | Confirmed Blocked |
-| 138 | NetBIOS Datagram | False | Confirmed Blocked |
-| 139 | NetBIOS Session | False | Confirmed Blocked |
-| 593 | RPC over HTTP | False | Confirmed Blocked |
-| 5985 | WinRM HTTP | False | Confirmed Blocked |
-| 5986 | WinRM HTTPS | False | Confirmed Blocked |
 
 ### Firewall Logging
 Firewall logging was enabled on all three profiles to monitor traffic hitting the server.
